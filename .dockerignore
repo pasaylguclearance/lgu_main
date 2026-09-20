@@ -1,0 +1,15 @@
+.git
+.github
+node_modules
+vendor
+.env
+.env.backup
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+public/storage
+docker/db-init/*.sql
+*.bak
+*.rar
+_downloads

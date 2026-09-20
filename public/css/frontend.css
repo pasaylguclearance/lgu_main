@@ -1,0 +1,19 @@
+section.section.section-lg.bg-gradient-1,
+section#explore-sec {
+    background: #3f3f3f;
+}
+
+section#explore-sec h2,
+section.section.section-lg.bg-gradient-1 h2 {
+    color: #fff;
+}
+
+.box-side.box-side-left.bg-gradient-1,
+.box-side.box-side-right.bg-gradient-1-reverse {
+    background: transparent !important;
+}
+
+section.section.section-lg.bg-gradient-1, section#explore-sec {
+    background: #3f3f3f;
+    padding: 50px 122px;
+}

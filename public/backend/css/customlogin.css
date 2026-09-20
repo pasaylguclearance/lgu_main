@@ -1,0 +1,86 @@
+@media (min-width: 1200px) {
+    .container.login {
+        max-width: 1280px !important;
+    }
+}
+@media (min-width: 768px) {
+    input#password, input#email {
+        width: 150px !important;
+    }
+    p.form-label {
+        width: 150px !important;
+    }
+}
+@media (min-width: 992px) {
+    input#password, input#email {
+        width: 250px !important;
+    }
+    p.form-label {
+        width: 250px !important;
+    }
+}
+p.section-title {
+    margin-bottom: 2em;
+}
+p.company-logo img {
+    width: 300px;
+}
+p.company-logo {
+    text-align: center;
+}
+p.section-title {
+    text-align: center;
+}
+p.section-title span {
+    color: white;
+    font-size: 20px;
+}
+.col-md-4.form-0 {
+    padding: 0px !important;
+    background: #091e3e;
+    padding-top: 4em !important;
+    padding-bottom: 4em !important;
+}
+input#password, input#email {
+    width: 250px;
+    margin: auto;
+    border-radius: 0px !important;
+}
+p.form-label {
+    width: 250px;
+    margin: auto;
+    margin-bottom: 5px;
+    color: white;
+    text-transform: uppercase;
+}
+.form-1 {
+    margin-top: 1em;
+}
+.col-md-8.slider-0 {
+    padding: 0px !important;
+    background: #dddddd;
+}
+p.form-label.forgot-password {
+    text-align: right;
+    text-transform: unset !important;
+}
+p.form-btn {
+    text-align: center;
+}
+p.form-btn button.btn.btn-primary {
+    width: 120px;
+    background-color:#c6262f !important;
+    border-color: #c6262f !important;
+}
+.form-1.submit-btn {
+    margin-top: 4em;
+}
+.form-1.register-btn {
+    text-align: center;
+}
+.form-1.register-btn a span {
+    color: white !important;
+}
+.form-carousel {
+    margin: 4em;
+}
