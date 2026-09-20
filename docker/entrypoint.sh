@@ -23,6 +23,12 @@ chmod -R ug+rwX storage bootstrap/cache
 if ! grep -qE '^APP_KEY=base64:' .env; then
     php artisan key:generate --force --no-interaction
 fi
+# docker-compose's env_file is read when the container is created, so on a first
+# run the environment still carries an empty APP_KEY that shadows the one just
+# written to .env. Export the real value so Apache/PHP inherit it.
+if [ -z "${APP_KEY}" ]; then
+    export APP_KEY="$(sed -n 's/^APP_KEY=//p' .env | tr -d '\r"')"
+fi
 
 # Wait for the database
 echo "[entrypoint] waiting for database ${DB_HOST:-db}:${DB_PORT:-3306} ..."

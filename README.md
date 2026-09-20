@@ -4,7 +4,10 @@ Laravel 5.8 / PHP 7.4 / MariaDB application (replicated from `policeclearance_ma
 
 ## Requirements
 
-- Docker Desktop (WSL 2 backend)
+- Docker Desktop (WSL 2 backend). On a fresh Windows install run `wsl --install --no-distribution`
+  from an admin prompt and reboot first, otherwise the Docker engine fails to start.
+- If `docker` is "not recognized" in PowerShell, add `C:\Program Files\Docker\Docker\resources\bin` to PATH
+  or run `$env:PATH += ";C:\Program Files\Docker\Docker\resources\bin"` in the session.
 
 ## First run
 
@@ -13,6 +16,10 @@ Laravel 5.8 / PHP 7.4 / MariaDB application (replicated from `policeclearance_ma
    ```
    docker/db-init/01_pasay_police_clearance.sql
    ```
+
+   > The original export writes empty strings as `CONVERT(0x USING utf8mb4)`, which MariaDB rejects
+   > (`Unknown column '0x'`) and the import silently stops part-way (only ~9 of 15 tables). If you
+   > re-export the dump, replace every `CONVERT(0x USING utf8mb4)` with `''` before importing.
 
 2. Build and start everything:
 
@@ -42,6 +49,29 @@ docker compose exec app php artisan tinker
 ```
 
 The project folder is bind-mounted into the container, so editing files on Windows takes effect immediately.
+
+## Auto-start on boot
+
+The stack comes up by itself after Windows sign-in, via two layers:
+
+1. Docker Desktop is set to *Start when you sign in* (Settings → General), and the containers use
+   `restart: unless-stopped`, so they return as soon as the engine is up.
+2. A Scheduled Task **LGU Docker Stack** (trigger: at logon, 20 s delay) runs `docker/start-stack.ps1`,
+   which launches Docker Desktop if needed, waits for the engine, and runs `docker compose up -d`.
+   This also recovers the stack if it was stopped with `docker compose down`. It logs to
+   `storage/logs/start-stack.log`.
+
+To (re)register the task on another machine:
+
+```powershell
+$script  = "$PWD\docker\start-stack.ps1"
+$action  = New-ScheduledTaskAction -Execute powershell.exe -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`""
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"; $trigger.Delay = 'PT20S'
+Register-ScheduledTask -TaskName 'LGU Docker Stack' -Action $action -Trigger $trigger -Force
+```
+
+Docker Desktop needs a signed-in user session; if the PC should be usable without anyone logging in,
+enable Windows auto-login (`netplwiz`) for this account.
 
 ## Resetting the database
 

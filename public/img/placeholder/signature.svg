@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <rect width="400" height="120" fill="#f8f9fa"/>
+  <path d="M30 80c30-50 50-50 70-10s40 30 60-20 40-30 60 0 40 40 60 10 40-40 60-10" fill="none" stroke="#ced4da" stroke-width="4" stroke-linecap="round"/>
+  <text x="200" y="108" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#adb5bd" text-anchor="middle">NO SIGNATURE</text>
+</svg>

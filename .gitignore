@@ -9,6 +9,7 @@
 !/public/img/blank.png
 !/public/img/logo.png
 !/public/img/slide-*.png
+!/public/img/placeholder/
 /public/storage
 /storage/*.key
 /vendor

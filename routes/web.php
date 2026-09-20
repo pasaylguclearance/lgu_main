@@ -29,6 +29,11 @@ Route::get('/print', function () {
     return view('backend.partial.id_layout');
 });
 
+// Missing images (uploads not present on this host, absent static assets)
+// fall through .htaccess to here and get a placeholder instead of a 404.
+Route::get('/img/{path}', 'ImageFallbackController@show')->where('path', '.*');
+Route::get('/backend/img/{path}', 'ImageFallbackController@show')->where('path', '.*');
+
 Route::group(['prefix' => 'topaz', 'middleware' => ['auth']], function () {
     Route::get('/diagnostics', function () {
         return view('backend.pages.tools.topaz_diagnostics');

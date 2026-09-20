@@ -1,6 +1,12 @@
 # Laravel 5.8 requires PHP 7.1-7.4; the original deployment ran PHP 7.4
 FROM php:7.4-apache
 
+# php:7.4 is built on Debian 11 (bullseye), which is EOL: its packages now live on
+# archive.debian.org and the regular mirrors return 404. Repoint apt before installing.
+RUN echo 'deb http://archive.debian.org/debian bullseye main' > /etc/apt/sources.list \
+    && rm -f /etc/apt/sources.list.d/*.list \
+    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive
+
 # System libs + PHP extensions Laravel/this app needs
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip curl libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev default-mysql-client \
@@ -23,10 +29,11 @@ WORKDIR /var/www/html
 # (When the source is bind-mounted in docker-compose, the entrypoint re-runs
 #  composer install if vendor/ is missing.)
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction || true
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
 COPY . .
-RUN composer dump-autoload --optimize --no-interaction || true
+# --no-scripts: package:discover needs a DB-less bootable app; the entrypoint runs it at start
+RUN composer dump-autoload --optimize --no-scripts --no-interaction
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \

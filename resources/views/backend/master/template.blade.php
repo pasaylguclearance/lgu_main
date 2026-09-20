@@ -4,6 +4,7 @@
 <head>
 	<script type="text/javascript">var ac_max_results = 0;</script>
 	<meta charset="utf-8">
+	@include('partials.image-fallback')
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<link rel="icon" href="{{ asset('/img/logo.png') }}" type="image/x-icon">
