@@ -54,7 +54,7 @@ class ApplicationController extends Controller
 
     public function completed_update(Request $request, $id)
     {
-        NewApplication::find($id)->update($request->all());
+        NewApplication::findOrFail($id)->update($request->all());
         return redirect()->back()->with('success','Successfully Updated');
     }
 
@@ -223,7 +223,13 @@ class ApplicationController extends Controller
     public function store(Request $request)
     {
         $application = $request->validate([
-            'new_application_id' => ['required', 'max:250'],
+            // Scoped lookup: an account with a visibility window cannot attach a
+            // transaction to an applicant it is not allowed to see.
+            'new_application_id' => ['required', function ($attribute, $value, $fail) {
+                if (!NewApplication::where('id', $value)->exists()) {
+                    $fail('The selected applicant was not found.');
+                }
+            }],
             'type' => ['required', 'max:250'],
             'date' => ['required', 'max:250'],
         ]);
@@ -247,7 +253,7 @@ class ApplicationController extends Controller
 
     public function update(Request $request, $id)
     {
-        Application::find($id)->update($request->all());
+        Application::findOrFail($id)->update($request->all());
         return redirect()->back()->with('success','Successfully Updated');
     }
 
@@ -261,6 +267,11 @@ class ApplicationController extends Controller
     public function renewApplication(Request $request) {
         
         $application = $request->validate([
+            'application_id' => ['required', function ($attribute, $value, $fail) {
+                if (!NewApplication::where('id', $value)->exists()) {
+                    $fail('The selected applicant was not found.');
+                }
+            }],
             'date_renew' => ['required'],
             'date_expiry' => ['required']
         ]);

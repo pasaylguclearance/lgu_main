@@ -44,5 +44,19 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        // Account-level data visibility window (see App\Scopes\VisibilityWindowScope).
+        // Intentionally NOT in $fillable: it can only be set server-side via
+        // `php artisan user:visibility`, never through the Users form / mass assignment.
+        'data_visibility_start_at' => 'datetime',
     ];
+
+    /**
+     * Whether this account only sees records created on/after a start date.
+     *
+     * @return bool
+     */
+    public function hasVisibilityWindow()
+    {
+        return !empty($this->data_visibility_start_at);
+    }
 }

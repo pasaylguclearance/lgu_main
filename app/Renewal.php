@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Concerns\HasVisibilityWindow;
 use Illuminate\Database\Eloquent\Model;
 
 class Renewal extends Model
 {
+    use HasVisibilityWindow;
+
     protected $fillable = [
         'application_id',
         'or_no',

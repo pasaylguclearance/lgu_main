@@ -58,7 +58,11 @@ class NewApplicationController extends Controller
     public function store(Request $request)
     {
         $application_record = $request->validate([
-            'selected_applicant_id' => ['nullable', 'exists:new_applications,id'],
+            'selected_applicant_id' => ['nullable', function ($attribute, $value, $fail) {
+                if ($value !== null && $value !== '' && !NewApplication::where('id', $value)->exists()) {
+                    $fail('The selected applicant was not found.');
+                }
+            }],
             'derogatory_values' => ['nullable', 'max:4000'],
             'application_no' => [ 'max:250'],
             'or_no' => [ 'max:250'],
@@ -156,7 +160,8 @@ class NewApplicationController extends Controller
             }
         }
 
-        $last_id = NewApplication::orderBy('id', 'desc')->first();
+        // Number sequence must consider ALL rows, not just the ones this account may see.
+        $last_id = NewApplication::unrestricted()->orderBy('id', 'desc')->first();
         $id = ($last_id === NULL) ? $code = 1 : $code = $last_id->id + 1;
         $ucid = 'PSY-'.Carbon::today()->format('mdY').'-'. str_pad($code + 2000, 7, '0', STR_PAD_LEFT);
         $code = 'PC-'. str_pad($code, 7, '0', STR_PAD_LEFT);
@@ -473,6 +478,9 @@ class NewApplicationController extends Controller
         $data = $request->all();
         $filename= date("Ymdhmis");
         $record = NewApplication::find($data['id']);
+        if (!$record) {
+            return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
+        }
         session(['active_new_application_id' => $data['id']]);
 
         NewApplication::where('id', $data['id'])->update(['finger_print_right'=>  $filename]);
@@ -500,6 +508,9 @@ class NewApplicationController extends Controller
         $data = $request->all();
         $filename= date("Ymdhmis");
         $record = NewApplication::find($data['id']);
+        if (!$record) {
+            return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
+        }
         session(['active_new_application_id' => $data['id']]);
 
         NewApplication::where('id', $data['id'])->update(['finger_print_left'=>  $filename]);
@@ -542,7 +553,7 @@ class NewApplicationController extends Controller
         
         $picture = $request->picture->move(public_path('img/signature/' . $id), $imageName);
 
-        NewApplication::find($id)->update(['signature' => $imageName]);
+        NewApplication::findOrFail($id)->update(['signature' => $imageName]);
         session(['active_new_application_id' => $id]);
 
         return redirect(url('new_application?tab=other&id='.$id))->with('success','Signature saved.');

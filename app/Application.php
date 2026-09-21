@@ -2,12 +2,19 @@
 
 namespace App;
 
+use App\Concerns\HasVisibilityWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Application extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasVisibilityWindow;
+
+    /** Rows are hidden for a restricted account unless the applicant is visible too. */
+    public function visibilityParents()
+    {
+        return ['new_application'];
+    }
 
     protected $fillable = [
         'new_application_id',

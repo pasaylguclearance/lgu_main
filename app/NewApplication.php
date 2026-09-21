@@ -2,12 +2,13 @@
 
 namespace App;
 
+use App\Concerns\HasVisibilityWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class NewApplication extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasVisibilityWindow;
 
     protected $fillable = [
             'application_no',

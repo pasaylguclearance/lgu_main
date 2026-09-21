@@ -18,6 +18,8 @@ class DashboardController extends Controller
         $start = Carbon::now('UTC')->startOfMonth();
         $end = Carbon::now('UTC')->endOfMonth();
         $dashboard = Dashboard::orderBy('id')->get();
+        // Today's renewals, counted the same way filterRecord() does.
+        $renewalCount = Renewal::whereDate('created_at', $day->toDateString())->count();
 
         $application = Application::where('created_at', $day)->where('status', 'PAID')->count() + $renewalCount;
         $applicant = Application::where('created_at', $day)->count() + $renewalCount;

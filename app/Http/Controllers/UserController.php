@@ -87,7 +87,17 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        User::find($id)->update($request->all());
+        $user = User::findOrFail($id);
+        // Only the form's own fields are written (mass-assignment already blocks
+        // data_visibility_start_at/password). middlename/suffix are NOT NULL
+        // columns but optional on the form: blank must be '' not null.
+        $data = $request->only(['firstname', 'middlename', 'lastname', 'suffix', 'email', 'status']);
+        foreach (['middlename', 'suffix'] as $k) {
+            if (array_key_exists($k, $data)) {
+                $data[$k] = (string) $data[$k];
+            }
+        }
+        $user->update(array_filter($data, function ($v) { return $v !== null; }));
         return redirect()->back()->with('success', 'Successfully Updated');
     }
 
