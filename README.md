@@ -33,9 +33,9 @@ Laravel 5.8 / PHP 7.4 / MariaDB application (replicated from `policeclearance_ma
 
    | Service      | URL                          | Credentials              |
    |--------------|------------------------------|--------------------------|
-   | Application  | http://localhost:8000        | users from the DB dump   |
-   | phpMyAdmin   | http://localhost:8080        | `root` / `root`          |
-   | MariaDB      | `localhost:3306`             | `lgu` / `lgu` (db `pasay_police_clearance`) |
+   | Application  | http://localhost:8200        | `superadmin@gmail.com` / `P@ssw0rd` (seeded by migration) |
+   | phpMyAdmin   | http://localhost:8201        | `root` / `root`          |
+   | MariaDB      | `localhost:33200`             | `lgu` / `lgu` (db `pasay_police_clearance`) |
 
 ## Everyday commands
 
