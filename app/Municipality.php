@@ -2,12 +2,13 @@
 
 namespace App;
 
+use App\Concerns\TolerantDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Municipality extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, TolerantDates;
 
     protected $fillable = [
         'municipality'
