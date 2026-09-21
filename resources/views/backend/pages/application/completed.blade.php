@@ -348,194 +348,178 @@
                     </div>
                     <div class="modal-body m-3">
                         <div class="print-bg" style="background: gray;">
-                            <div id="printCertificate" style="font-family: Arial;left: 10px;top: -10px;margin:auto;padding: 0px 10px;background: white;padding: 0 15px;">
-                                <div class="cert-bg" style="background-color: #fff;background-image: url(/img/new-background.png); background-position:center center; background-size: cover; background-repeat: no-repeat; width: 100%; height: auto;">
-                                <div style="padding: 0.3em;"></div>
-                                <div class="row">
-                                    <div class="col-md-3" style="text-align: center;">
-                                        <img src="/backend/img/logos/pasay-logo.png" style="width: 85px;" alt="">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p style="margin-bottom: 0px; text-align: center;  font-size: 10pt; font-weight: bold; color: black; text-transform: uppercase; font-family: 'Arial'; " class="">Republic of the Philippines</p>
-                                        {{-- <p style="margin-bottom: 0px; text-align: center;  font-size: 10pt; font-weight: bold; color: black; text-transform: uppercase; font-family: 'Arial';  margin-top: -5px;" class="">National Police Commission</p>
-                                        <p style="margin-bottom: 0px; text-align: center;  font-size: 10pt; font-weight: bold; color: black; text-transform: uppercase; font-family: 'Arial';  margin-top: -5px;" class="">Philippine National Police</p> --}}
-                                        <p style="margin-bottom: 0px; text-align: center; font-size: 17pt; color: black; text-transform: uppercase; font-weight: bold; text-transform: uppercase; font-family: 'Arial'; margin-top: -5px;" class="">CITY GOVERNMENT OF PASAY</p>
-                                        <p style="margin-bottom: 0px; text-align: center;  font-size: 9pt; color: black; text-transform: uppercase;  margin-top: -5px; font-weight: bold; font-family: 'Arial';" class="">F.B Harrison Street, Pasay City</p>
-                                        <p style="margin-bottom: 0px; text-align: center;  font-size: 9pt; color: black; text-transform: uppercase;  margin-top: -5px;" class="">TELEPHONE NUMBER: 02-82878343</p>
-                                    </div>
-                                    <div class="col-md-3" style="text-align: center;">
-                                        <img src="/backend/img/logos/rp-logo.png" style="width: 85px;" alt="">
-                                    </div>
-                                </div>
-                                <div style="padding: 0.3em;"></div>
+                            <div id="printCertificate" style="font-family: Arial; margin: auto; background: white;">
+                                            <style>
+                                                /* Certificate design. Lives inside #printCertificate on purpose: printDiv() copies
+                                                   innerHTML into a bare print window, so these rules travel with the markup. */
+                                                .pnp-cert, .pnp-cert * { box-sizing: border-box; }
+                                                .pnp-cert { font-family: Arial, Helvetica, sans-serif; color: #111827; line-height: 1.25; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                                .pnp-cert p { margin: 0; }
+                                                .pnp-cert img { display: block; }
+                                                .pc-sheet { background: #fff url(/img/new-background.png) center center / cover no-repeat; border-top: 5px solid #14213d; padding: 10px 16px 10px; }
+                                                .pc-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px solid #cfd5e1; }
+                                                .pc-head-logo { width: 68px; height: 68px; flex: 0 0 68px; object-fit: contain; }
+                                                .pc-head-text { flex: 1; text-align: center; padding: 0 12px; }
+                                                .pc-eyebrow { font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; color: #4b5563; }
+                                                .pc-org { font-size: 18pt; font-weight: bold; letter-spacing: .5px; text-transform: uppercase; color: #14213d; margin: 1px 0; line-height: 1.1; }
+                                                .pc-sub { font-size: 8pt; letter-spacing: .3px; text-transform: uppercase; color: #4b5563; }
+                                                .pc-titlebar { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 8px; }
+                                                .pc-title { border-left: 6px solid #d62828; padding: 2px 0 2px 12px; }
+                                                .pc-title-eyebrow { display: block; font-size: 8.5pt; font-weight: bold; letter-spacing: 2.5px; text-transform: uppercase; color: #d62828; }
+                                                .pc-title-main { display: block; font-size: 17pt; font-weight: bold; letter-spacing: .5px; white-space: nowrap; text-transform: uppercase; color: #14213d; line-height: 1.05; }
+                                                .pc-control { min-width: 236px; text-align: right; background: rgba(255,255,255,.9); border: 1px solid #cfd5e1; border-radius: 6px; padding: 6px 12px; }
+                                                .pc-control-label { display: block; font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7280; }
+                                                .pc-control-no { display: block; font-size: 15pt; font-weight: bold; letter-spacing: .5px; color: #d62828; line-height: 1.2; }
+                                                .pc-control-dates { display: block; font-size: 7pt; white-space: nowrap; text-transform: uppercase; color: #374151; margin-top: 2px; }
+                                                .pc-control-dates b { color: #14213d; }
+                                                .pc-body { display: flex; align-items: stretch; }
+                                                .pc-main { flex: 1; min-width: 0; margin-right: 14px; background: rgba(255,255,255,.88); border: 1px solid #cfd5e1; border-radius: 6px; padding: 10px 12px; }
+                                                .pc-certify { font-size: 8pt; color: #374151; margin-bottom: 8px; }
+                                                .pc-certify b { color: #14213d; letter-spacing: .5px; text-transform: uppercase; }
+                                                .pc-label { display: block; font-size: 7pt; letter-spacing: 1.2px; text-transform: uppercase; color: #6b7280; margin-bottom: 1px; }
+                                                .pc-value { display: block; font-size: 9pt; text-transform: uppercase; color: #111827; min-height: 12px; }
+                                                .pc-name { padding-bottom: 6px; margin-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+                                                .pc-name .pc-value { font-size: 15pt; font-weight: bold; letter-spacing: .3px; color: #14213d; }
+                                                .pc-grid { display: flex; flex-wrap: wrap; margin: 0 -6px; }
+                                                .pc-field { flex: 0 0 25%; max-width: 25%; padding: 0 6px; margin-bottom: 6px; }
+                                                .pc-field.g1 { flex: 0 0 19%; max-width: 19%; }
+                                                .pc-field.g2 { flex: 0 0 25%; max-width: 25%; }
+                                                .pc-field.g3 { flex: 0 0 25%; max-width: 25%; }
+                                                .pc-field.g4 { flex: 0 0 31%; max-width: 31%; }
+                                                .pc-field.w2 { flex: 0 0 50%; max-width: 50%; }
+                                                .pc-field.w4 { flex: 0 0 100%; max-width: 100%; }
+                                                .pc-address .pc-value { min-height: 24px; }
+                                                .pc-purpose .pc-value { font-weight: bold; }
+                                                .pc-note { display: none; font-size: 8pt; font-style: italic; color: #374151; margin-top: 1px; }
+                                                .pc-result { display: flex; align-items: center; background: #f1f4f9; border: 1px solid #cfd5e1; border-left: 4px solid #14213d; border-radius: 4px; padding: 6px 10px; margin-top: 1px; }
+                                                .pc-result .pc-label { margin: 0 10px 0 0; flex: 0 0 auto; }
+                                                .pc-result .pc-value { font-size: 10pt; font-weight: bold; color: #14213d; }
+                                                .pc-disclaimer { font-size: 7pt; font-style: italic; text-transform: uppercase; color: #4b5563; margin-top: 8px; }
+                                                .pc-side { flex: 0 0 2.35in; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,.88); border: 1px solid #cfd5e1; border-radius: 6px; padding: 10px; }
+                                                .pc-photo { width: 2in; height: 2in; border: 1px solid #9ca3af; background: #f3f4f6 center center / cover no-repeat; }
+                                                .pc-photo.empty, .pc-sig.empty { display: flex; align-items: center; justify-content: center; font-size: 7.5pt; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; }
+                                                .pc-sig { width: 2in; height: .5in; margin-top: 6px; border-bottom: 2px solid #14213d; background: center top / 100% 100% no-repeat; }
+                                                .pc-caption { font-size: 7pt; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7280; margin-top: 3px; }
+                                                .pc-thumbs { display: flex; width: 2in; margin-top: 8px; }
+                                                .pc-thumb { flex: 1; height: 64px; border: 1px dashed #b6bdca; border-radius: 4px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 3px; font-size: 6.5pt; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; }
+                                                .pc-thumb + .pc-thumb { margin-left: 6px; }
+                                                .pc-foot { display: flex; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #cfd5e1; }
+                                                .pc-foot-brand { display: flex; align-items: center; flex: 0 0 auto; margin-right: 14px; }
+                                                .pc-foot-brand img { width: 66px; height: 66px; object-fit: contain; margin-right: 8px; }
+                                                .pc-qr { width: 84px; height: 84px; padding: 2px; background: #fff; border: 1px solid #cfd5e1; }
+                                                .pc-qr img { max-width: 100%; height: auto; }
+                                                .pc-meta { flex: 1; display: flex; flex-wrap: wrap; align-content: center; background: rgba(255,255,255,.88); border: 1px solid #cfd5e1; border-radius: 6px; padding: 5px 8px; margin-right: 14px; }
+                                                .pc-meta div { flex: 0 0 50%; max-width: 50%; padding: 1px 6px; font-size: 7pt; text-transform: uppercase; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                                                .pc-meta b { display: inline; font-size: 6.5pt; font-weight: bold; letter-spacing: .8px; color: #6b7280; margin-right: 3px; }
+                                                .pc-seal { flex: 0 0 auto; text-align: center; }
+                                                .pc-seal-badge { display: inline-block; border: 2px solid #d62828; border-radius: 4px; padding: 4px 9px; font-size: 7.5pt; white-space: nowrap; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; color: #d62828; }
+                                                .pc-seal-amount { font-size: 7pt; text-transform: uppercase; color: #374151; margin-top: 5px; }
+                                                .pc-seal-amount b { color: #14213d; }
+                                            </style>
+                                <div class="pnp-cert">
+                                    <div class="pc-sheet">
+                                        <div class="pc-head">
+                                            <img class="pc-head-logo" src="/backend/img/logos/pasay-logo.png" alt="">
+                                            <div class="pc-head-text">
+                                                <div class="pc-eyebrow">Republic of the Philippines</div>
+                                                <div class="pc-org">City Government of Pasay</div>
+                                                <div class="pc-sub">F.B Harrison Street, Pasay City &nbsp;&middot;&nbsp; Telephone Number: 02-82878343</div>
+                                            </div>
+                                            <img class="pc-head-logo" src="/backend/img/logos/rp-logo.png" alt="">
+                                        </div>
 
-                                <div class="row">
-                                    <div class="col-md-12" style="padding:0px;">
-                                        <p style="margin-bottom: 0px; text-align: center; font-weight: bold; color: white; font-size: 17pt; background: #ed1c24; text-transform: uppercase;" class="">Pasay local government Derogatory Clearance</p>
-                                    </div>
-                                </div>
-                                <div style="padding: 0.5em;"></div>
-                                <div class="row">
-                                    <div class="col-md-7">
-                                        <p style="margin-bottom: 0px; font-size: 9pt; color: black; font-weight: 700; text-transform: uppercase;" class="">To whom it may concern:</p>
-                                        <p style="margin-bottom: 0px; font-size: 8pt !important; color: black;" class="">This is to certify that the person whose name, signature, picture and finger prints appear hearon has requested a RECORD CLEARANCE from this office and result(s) is/are below:</p>
-                                    </div>
-                                    <div style="text-align:right;" class="col-md-5">
-                                        <p style="margin-bottom: 0px; font-size: 11pt; color: black; text-transform: uppercase; margin-top: -5px;" class="">
-                                            <span style="display: block; font-weight: bold;">Control Number:</span>
-                                        <span id="c_ucid" style="font-weight: bold;font-size: 15pt !important;color: #ed1c24;margin-top: -7px;display: block;"></span></p>
-                                        <div style="margin-top: -10px;font-weight: bold;">
-                                            <span style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: -5px;" class="">Date Issued: <span id="c_issued"></span></span>  |  
-                                            <span style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: -5px;" class="">Valid Until: <span id="c_valid"></span></span>
+                                        <div class="pc-titlebar">
+                                            <div class="pc-title">
+                                                <span class="pc-title-eyebrow">Pasay Local Government</span>
+                                                <span class="pc-title-main">Derogatory Clearance</span>
+                                            </div>
+                                            <div class="pc-control">
+                                                <span class="pc-control-label">Control Number</span>
+                                                <span class="pc-control-no" id="c_ucid"></span>
+                                                <span class="pc-control-dates"><b>Date Issued:</b> <span id="c_issued"></span> &nbsp;&middot;&nbsp; <b>Valid Until:</b> <span id="c_valid"></span></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="pc-body">
+                                            <div class="pc-main">
+                                                <p class="pc-certify"><b>To whom it may concern:</b> This is to certify that the person whose name, signature, picture and finger prints appear hearon has requested a RECORD CLEARANCE from this office and result(s) is/are below:</p>
+                                                <div class="pc-name">
+                                                    <span class="pc-label">Name</span>
+                                                    <span class="pc-value" id="c_name"></span>
+                                                </div>
+                                                <div class="pc-grid">
+                                                    <div class="pc-field w4 pc-address">
+                                                        <span class="pc-label">Address</span>
+                                                        <span class="pc-value" id="c_address"></span>
+                                                    </div>
+                                                    <div class="pc-field w2">
+                                                        <span class="pc-label">Date of Birth</span>
+                                                        <span class="pc-value" id="c_dob"></span>
+                                                    </div>
+                                                    <div class="pc-field w2">
+                                                        <span class="pc-label">Place of Birth</span>
+                                                        <span class="pc-value" id="c_bplace"></span>
+                                                    </div>
+                                                    <div class="pc-field g1">
+                                                        <span class="pc-label">Gender</span>
+                                                        <span class="pc-value" id="c_gender"></span>
+                                                    </div>
+                                                    <div class="pc-field g2">
+                                                        <span class="pc-label">Civil Status</span>
+                                                        <span class="pc-value" id="c_civil_status"></span>
+                                                    </div>
+                                                    <div class="pc-field g3">
+                                                        <span class="pc-label">Citizenship</span>
+                                                        <span class="pc-value" id="c_nationality"></span>
+                                                    </div>
+                                                    <div class="pc-field g4">
+                                                        <span class="pc-label">Religion</span>
+                                                        <span class="pc-value" id="c_religion"></span>
+                                                    </div>
+                                                    <div class="pc-field w4 pc-purpose">
+                                                        <span class="pc-label">Purpose</span>
+                                                        <span class="pc-value" id="c_purpose"></span>
+                                                        <p class="pc-note" id="not_valid">(NOT VALID FOR ABROAD AND NATURALIZATION)</p>
+                                                    </div>
+                                                </div>
+                                                <div class="pc-result">
+                                                    <span class="pc-label">Remarks</span>
+                                                    <span class="pc-value" id="c_derogatory">NO DEROGATORY RECORDS FOUND</span>
+                                                </div>
+                                                <p class="pc-disclaimer">*The information on this Pasay local government Derogatory Clearance has been subjected verification against Pasay OCC and PNP watch list. Any discrepancies and tampering may lead to legal actions in accordance to Philippine Laws.</p>
+                                            </div>
+
+                                            <div class="pc-side">
+                                                <div id="c_picture_2" class="pc-photo"></div>
+                                                <div id="id_signature_cert_2" class="pc-sig"></div>
+                                                <div class="pc-caption">Applicant's Signature</div>
+                                                <div class="pc-thumbs">
+                                                    <div class="pc-thumb">Left Thumb</div>
+                                                    <div class="pc-thumb">Right Thumb</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="pc-foot">
+                                            <div class="pc-foot-brand">
+                                                <img src="/backend/img/logos/mayor-logo.png" alt="">
+                                                <div class="pc-qr"><div id="qrcode"></div></div>
+                                            </div>
+                                            <div class="pc-meta">
+                                                <div><b>Encoder</b> JOYCE TIMTIMAN</div>
+                                                <div><b>Print By</b> JOYCE TIMTIMAN</div>
+                                                <div><b>Print Date</b> <span id="c_or_date"></span></div>
+                                                <div><b>OR Number</b> <span id="c_or_no"></span></div>
+                                                <div><b>Cedula Number</b> <span id="c_cedula_no"></span></div>
+                                                <div><b>Issued At</b> <span id="c_issued_at"></span></div>
+                                                <div><b>Issued On</b> <span id="c_issued_date"></span></div>
+                                            </div>
+                                            <div class="pc-seal">
+                                                <div class="pc-seal-badge">Not Valid Without Dryseal</div>
+                                                <div class="pc-seal-amount"><b>OR Date / Total Amount:</b> <span id="c_issued_or_date"></span> / P 250.00</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <table style="width:100%; margin-top:5px;">
-                                        <tr>
-                                            <td style="width:auto;vertical-align: top;">
-                                                <table style="width:100%;">
-                                                    <tr>
-                                                        <td colspan="4" style="text-transform:uppercase;font-size: 12pt !important;font-weight: bold;padding: 0 8px;color: #000;">
-                                                            <div>NAME: <span id="c_name"></span></div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4" style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:11pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">ADDRESS:</span>
-                                                            <p style="margin-bottom:0px;height:45px;" class="" id="c_address"></p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">DATE OF BIRTH:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_dob"></p>
-                                                        </td>
-                                                        <td colspan="2" style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">PLACE OF BIRTH:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_bplace"></p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">GENDER:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_gender"></p>
-                                                        </td>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">CIVIL STATUS:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_civil_status"></p>
-                                                        </td>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">CITIZENSHIP:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_nationality"></p>
-                                                        </td>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">RELIGION:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_religion"></p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                                <table style="width:100%;margin-top:10px;">
-                                                    <tr>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">PURPOSE:</span>
-                                                            <p style="margin-bottom:0px; font-weight:bold;" class="" id="c_purpose"></p>
-                                                            <p style="margin-bottom: 0px; display: none; font-style:italic;" id="not_valid">(NOT VALID FOR ABROAD AND NATURALIZATION)</p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="text-transform:uppercase;padding: 0 8px;color: #000; font-size:9pt;">
-                                                            <span style="display:block;color:#000;font-weight:bold;">REMARKS:</span>
-                                                            <p style="margin-bottom:0px;" class="" id="c_derogatory">NO DEROGATORY RECORDS FOUND</p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4" style="width:25%;text-align:left;line-height: 11px;vertical-align: top;padding:15px 0px;padding-bottom: 0px;">
-                                                            <div style="font-size: 8pt;color: black;text-transform: uppercase;margin-top: 0;white-space: normal;margin-bottom: 10px;font-style:italic;">*The information on this Pasay local government Derogatory Clearance has been subjected verification against Pasay OCC and PNP watch list. Any discrepancies and tampering may lead to legal actions in accordance to Philippine Laws.</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="qr-container" style="display:flex;">
-                                                                <div>
-                                                                    <img src="/backend/img/logos/mayor-logo.png" style="width: 90px;margin-right:10px;" alt="">
-                                                                </div>
-                                                                <div id="qrcode"></div>
-                                                                <div id="footer-details" style="display: flex;padding: 0 10px;width: 100%;">
-                                                                    <div style="padding:0 10px;">
-                                                                        <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;"><b style="font-weight:bold;">ENCODER:</b> JOYCE TIMTIMAN</div>
-                                                                        <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;"><b style="font-weight:bold;">PRINT BY:</b> JOYCE TIMTIMAN</div>
-                                                                        <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;"><b style="font-weight:bold;">PRINT DATE:</b> <span id="c_or_date"></span></div>
-                                                                        <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;"><b style="font-weight:bold;">OR NUMBER:</b> <span id="c_or_no"></span></div>
-                                                                    </div>
-                                                                    <div style="padding:0 10px;">
-                                                                        <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;"><b style="font-weight:bold;">CEDULA NUMBER:</b> <span id="c_cedula_no"></span></p>
-                                                                        <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;"><b style="font-weight:bold;">ISSUED AT:</b> <span id="c_issued_at"></span></p>
-                                                                        <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;"><b style="font-weight:bold;">ISSUED ON:</b> <span id="c_issued_date"></span></p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    {{-- <tr>
-                                                        <td style="width:25%;text-align:left;line-height: 11px;vertical-align: top;">
-                                                            <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;">ENCODER: JOYCE TIMTIMAN</div>
-                                                            <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;">PRINT BY: JOYCE TIMTIMAN</div>
-                                                            <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;">PRINT DATE: <span id="c_or_date"></span></div>
-                                                            <div style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: 0;">OR NUMBER: <span id="c_or_no"></span></div>
-                                                        </td>
-                                                        <td style="width:25%;text-align:left;line-height: 11px;vertical-align: top;">
-                                                            <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;">CEDULA NUMBER: <span id="c_cedula_no"></span></p>
-                                                            <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;">ISSUED AT: <span id="c_issued_at"></span></p>
-                                                            <p style="color: black; text-transform: uppercase;font-size: 8pt;margin:0px;">ISSUED ON: <span id="c_issued_date"></span></p>
-                                                        </td>
-                                                        <td style="text-align:center;">
-                                                            <img src="/img/hepe.png" style="height: 39px;" alt="">
-                                                            <p style="margin-bottom: 0px; font-size: 8pt; font-weight: 800; color: black; text-transform: uppercase; border-top: 1px Solid;">PSMS MARJHUNE A MENDOZA </p>
-                                                            <p style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: -5px;">::: CRIMINAL RECORD PNCO :::</p>
-                                                        </td>
-                                                        <td style="text-align:center;">
-                                                            <img src="/img/mayames.png" style="height: 39px;" alt="">
-                                                            <p style="margin-bottom: 0px; font-size: 8pt; font-weight: 800; color: black; text-transform: uppercase; border-top: 1px Solid;">PCOL MARIO L MAYAMES, JR</p>
-                                                            <p style="margin-bottom: 0px; font-size: 8pt; color: black; text-transform: uppercase; margin-top: -5px;">::: OFFICER IN-CHARGE :::</p>
-                                                        </td>
-                                                    </tr> --}}
-                                                </table>
-                                            </td>
-                                            <td style="width:2.3in; text-align:center;vertical-align: top;">
-                                                <div id="c_picture_2" style="width:2in; height:2in;margin:auto;"></div>
-                                                <div id="id_signature_cert_2" style="width:2in; height:2in;margin:auto;"></div>
-                                                <p style="margin-bottom: 0px; font-size: 9pt; color: black; text-transform: uppercase; ">Applicant's Signature</p>
-                                                <div class="finger-mark" style="display:flex;width:2in;margin:auto;">
-                                                    <div class="left-mark" style="width:100%;height:90px;margin:5px;">
-                                                        {{-- <div style="height:70px;border:1px solid #000;"></div>
-                                                        <div style="border:1px solid #000;font-size:10px;text-align:center;height:20px;padding:2px;">LEFT THUMB</div> --}}
-                                                    </div>
-                                                    <div class="right-mark" style="width:100%;height:90px;margin:5px;">
-                                                        {{-- <div style="height:70px;border:1px solid #000;"></div>
-                                                        <div style="border:1px solid #000;font-size:10px;text-align:center;height:20px;padding:2px;">RIGHT THUMB</div> --}}
-                                                    </div>
-                                                </div>
-                                                <div style="text-align:right;">
-                                                    <p style="font-size: 9pt;color: red; text-transform: uppercase;margin:0px;font-weight:bold;">NOT VALID WITHOUT DRYSEAL</p>
-                                                    <p style="font-size: 8pt;color: black; text-transform: uppercase;margin:0px;"><b style="font-weight:bold;">OR DATE/TOTAL AMOUNT:</b> <span id="c_issued_or_date"></span>/P 250.00 </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    {{-- <table style="width:100%; margin-top:10px;">
-                                        <tr>
-                                            <td colspan="2" style="line-height: 10px;vertical-align: top;margin-top:5px;padding: 3px;">
-                                            </td>
-                                            <td style="text-align:right;line-height: 11px;vertical-align: top;margin-top:5px;padding: 3px;" colspan="2">
-                                                <p style="font-size: 9pt;color: red; text-transform: uppercase;margin:0px;font-weight:bold;">NOT VALID WITHOUT DRYSEAL</p>
-                                                <p style="font-size: 8pt;color: black; text-transform: uppercase;margin:0px;">OR DATE/TOTAL AMOUNT: <span id="c_issued_or_date"></span>/P 250.00 </p>
-                                            </td>
-                                        </tr>
-                                    </table> --}}
-                                </div>
-
                                 </div>
                             </div>
                         </div>
