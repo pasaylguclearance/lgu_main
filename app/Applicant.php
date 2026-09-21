@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Concerns\TolerantDates;
 use Illuminate\Database\Eloquent\Model;
 
 class Applicant extends Model
 {
+    use TolerantDates;
+
     protected $fillable = [
         'firstname',
         'middlename',
