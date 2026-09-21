@@ -75,14 +75,38 @@
         $(document).on('click','#addBtn',function(){
             var imgData = document.getElementById('picture').src;
 
-            if($('#consent').is(':checked')) {
-                $('#addBtn').prop('disabled',true);
-                $.post("{{url('new_application/fingerprint_right/save')}}",{picture:imgData,id:"{{$latest_record->id}}"},function(data){
-                    window.location.href = "{{ url('new_application?tab=other&id='.$latest_record->id) }}"
-                });
-            }else{
-                alert('Please check the consent data policy');
+            if (!imgData || imgData.indexOf('data:image/') !== 0) {
+                alert('No fingerprint captured yet. Please scan the finger first.');
+                return;
             }
+            if (!$('#consent').is(':checked')) {
+                alert('Please check the consent data policy');
+                return;
+            }
+
+            var $btn = $('#addBtn');
+            $btn.prop('disabled', true);
+            $.post("{{url('new_application/fingerprint_right/save')}}",{picture:imgData,id:"{{$latest_record->id}}"})
+                .done(function(data){
+                    if (data && data.success) {
+                        window.location.href = "{{ url('new_application?tab=other&id='.$latest_record->id) }}";
+                        return;
+                    }
+                    alert((data && data.message) ? data.message : 'Failed to save fingerprint.');
+                    $btn.prop('disabled', false);
+                })
+                .fail(function(xhr){
+                    var message = 'Failed to save fingerprint.';
+                    if (xhr && xhr.status === 419) {
+                        message = 'Your session has expired. Please reload the page and try again.';
+                    } else if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    } else if (xhr && xhr.status === 0) {
+                        message = 'Could not reach the server. Check your network connection and try again.';
+                    }
+                    alert(message);
+                    $btn.prop('disabled', false);
+                });
         });
 
     });

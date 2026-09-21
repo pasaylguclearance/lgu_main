@@ -18,7 +18,7 @@
                                     <div id="my_camera"></div>
                                     <input type="hidden" name="picture"/>
                                     <div style="padding: 1em;"></div>
-                                    <button type="button" onClick="take_snapshot()" class="btn btn-danger">Take Snapshot</button>
+                                    <button type="button" id="snapshotBtn" onClick="take_snapshot()" class="btn btn-danger">Take Snapshot</button>
                                     <div style="padding: .5em;"></div>
                                     <label class="btn btn-outline-primary mb-0">
                                         Upload Photo
@@ -100,43 +100,104 @@
 <script>
     var cropper = null;
     var uploadedImageData = null;
+    var cameraReady = false;
+
+    function showPreview(dataUri) {
+        $('input[name="picture"]').val(1);
+        document.getElementById('results').innerHTML =
+            '<img id="imageprev" src="'+dataUri+'" width="400" height="400" style="object-fit:cover;"/>';
+    }
+
+    function showCameraError(message) {
+        cameraReady = false;
+        document.getElementById('my_camera').innerHTML =
+            '<div style="width:400px;max-width:100%;height:300px;display:flex;align-items:center;justify-content:center;' +
+            'padding:16px;border:1px dashed #9ca3af;color:#6b7280;font-size:13px;">' + message +
+            '<br><br>You can still use <b>Upload Photo</b> below.</div>';
+        $('#snapshotBtn').prop('disabled', true);
+    }
 
     function take_snapshot() {
-        // take snapshot and get image data
-        Webcam.snap( function(data_uri) {
-            // display results in page
-            $('input[name="picture"]').val(1);
-            document.getElementById('results').innerHTML =
-                '<img id="imageprev" src="'+data_uri+'" width="400" height="400" style="object-fit:cover;"/>';
-            } );
+        if (!cameraReady) {
+            alert('The camera is not available. Please allow camera access, or use Upload Photo instead.');
+            return;
         }
+        try {
+            Webcam.snap(function(data_uri) {
+                showPreview(data_uri);
+            });
+        } catch (err) {
+            alert('Could not take a snapshot: ' + (err && err.message ? err.message : err));
+        }
+    }
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     $(document).ready(function() {
         Webcam.set({
             width: 400,
             height: 400,
-            zoom:10,
             image_format: 'jpeg',
-            jpeg_quality: 90
+            jpeg_quality: 90,
+            enable_flash: false,
+            force_flash: false
         });
-        Webcam.attach( '#my_camera' );
+        Webcam.on('live', function () {
+            cameraReady = true;
+            $('#snapshotBtn').prop('disabled', false);
+        });
+        Webcam.on('error', function (err) {
+            var reason = (err && err.message) ? err.message : String(err);
+            if (/NotAllowed|Permission/i.test(reason)) {
+                reason = 'Camera access was blocked. Click the camera icon in the address bar to allow it, then reload.';
+            } else if (/NotFound|DevicesNotFound/i.test(reason)) {
+                reason = 'No camera was found on this computer.';
+            } else if (!navigator.mediaDevices && location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                reason = 'Browsers only allow the camera on https:// or localhost. Open the system via localhost or HTTPS.';
+            }
+            showCameraError(reason);
+        });
+        $('#snapshotBtn').prop('disabled', true);
+        try {
+            Webcam.attach('#my_camera');
+        } catch (err) {
+            showCameraError((err && err.message) ? err.message : String(err));
+        }
 
         $('#upload_photo').on('change', function(e){
             var file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+            $(this).val('');
             if (!file) return;
+            if (file.type && file.type.indexOf('image/') !== 0) {
+                alert('Please choose an image file (JPG or PNG).');
+                return;
+            }
+            if (file.size > 15 * 1024 * 1024) {
+                alert('The photo is too large (max 15 MB). Please choose a smaller image.');
+                return;
+            }
             var reader = new FileReader();
+            reader.onerror = function(){
+                alert('Could not read the selected file. Please try another image.');
+            };
             reader.onload = function(evt){
                 uploadedImageData = evt.target.result;
-                $('#cropImage').attr('src', uploadedImageData);
-                $('#cropPhotoModal').modal('show');
+                var probe = new Image();
+                probe.onerror = function(){
+                    uploadedImageData = null;
+                    alert('This image format is not supported by your browser (e.g. HEIC). Please use a JPG or PNG.');
+                };
+                probe.onload = function(){
+                    $('#cropImage').attr('src', uploadedImageData);
+                    $('#cropPhotoModal').modal('show');
+                };
+                probe.src = uploadedImageData;
             };
             reader.readAsDataURL(file);
-            $(this).val('');
         });
 
         $('#cropPhotoModal').on('shown.bs.modal', function () {
@@ -172,10 +233,7 @@
                 imageSmoothingQuality: 'high'
             });
             if (!canvas) return;
-            var croppedData = canvas.toDataURL('image/jpeg', 0.9);
-            $('input[name="picture"]').val(1);
-            document.getElementById('results').innerHTML =
-                '<img id="imageprev" src="'+croppedData+'" width="400" height="400" style="object-fit:cover;"/>';
+            showPreview(canvas.toDataURL('image/jpeg', 0.9));
             $('#cropPhotoModal').modal('hide');
         });
 
@@ -185,32 +243,42 @@
             var imageNode = document.getElementById("imageprev");
             var base64image = imageNode ? imageNode.src : null;
 
-            if(picture==1 && base64image){
-                if($('#consent').is(':checked')) {
-                    $('#addBtn').prop('disabled',true);
-                    $.post("{{url('new_application/picture')}}",{picture:base64image,id:"{{$latest_record->id}}"})
-                        .done(function(data){
-                            if (data && data.success) {
-                                window.location.href = "{{ url('new_application?tab=other&id='.$latest_record->id) }}";
-                                return;
-                            }
-                            alert('Failed to save picture.');
-                            $('#addBtn').prop('disabled',false);
-                        })
-                        .fail(function(xhr){
-                            var message = 'Failed to save picture.';
-                            if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
-                                message = xhr.responseJSON.message;
-                            }
-                            alert(message);
-                            $('#addBtn').prop('disabled',false);
-                        });
-                }else{
-                    alert('Please check the consent data policy');
-                }
-            }else{
-                alert('Picture is required');
+            if (picture != 1 || !base64image || base64image.indexOf('data:image/') !== 0) {
+                alert('Picture is required. Take a snapshot or upload a photo first.');
+                return;
             }
+            if (!$('#consent').is(':checked')) {
+                alert('Please check the consent data policy');
+                return;
+            }
+
+            var $btn = $('#addBtn');
+            $btn.prop('disabled', true).text('Saving...');
+            $.post("{{url('new_application/picture')}}",{picture:base64image,id:"{{$latest_record->id}}"})
+                .done(function(data){
+                    if (data && data.success) {
+                        window.location.href = "{{ url('new_application?tab=other&id='.$latest_record->id) }}";
+                        return;
+                    }
+                    alert((data && data.message) ? data.message : 'Failed to save picture.');
+                    $btn.prop('disabled', false).text('Submit');
+                })
+                .fail(function(xhr){
+                    var message = 'Failed to save picture.';
+                    if (xhr && xhr.status === 419) {
+                        message = 'Your session has expired. Please reload the page and try again.';
+                    } else if (xhr && xhr.status === 401) {
+                        message = 'You have been logged out. Please sign in again.';
+                    } else if (xhr && xhr.status === 413) {
+                        message = 'The image is too large for the server to accept.';
+                    } else if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    } else if (xhr && xhr.status === 0) {
+                        message = 'Could not reach the server. Check your network connection and try again.';
+                    }
+                    alert(message);
+                    $btn.prop('disabled', false).text('Submit');
+                });
         });
 
     });

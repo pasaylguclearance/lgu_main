@@ -58,9 +58,12 @@
                             <div class="modal-body m-3">
                                 <form id="modal-form" action="{{url('new_application/signature/' . $latest_record->id)}}" method="post"  enctype="multipart/form-data">
                                     @csrf
+                                @if ($errors->has('picture'))
+                                    <div class="alert alert-danger py-2 mx-3">{{ $errors->first('picture') }}</div>
+                                @endif
                                 <div class="form-group col-md-12">
-                                    <label for="inputPassword4">Signature</label>
-                                    <input type="file" class="form-control" id="picture" name="picture" placeholder="Enter Application">
+                                    <label for="picture">Signature image (JPG or PNG)</label>
+                                    <input type="file" class="form-control" id="picture" name="picture" accept="image/*" required>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -119,6 +122,10 @@
     }
 
     $(document).ready(function() {
+        @if ($errors->has('picture'))
+        $('#defaultModalPrimary').modal('show');
+        @endif
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

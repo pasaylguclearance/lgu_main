@@ -392,81 +392,90 @@ class NewApplicationController extends Controller
         return redirect()->back()->with('success','Successfully Deleted!');
     }
 
-    public function picture(Request $request) {
+    /**
+     * Decode a browser data-URI (camera snapshot, cropped upload, signature pad,
+     * fingerprint SDK) and write it to public/img/{$folder}/{$applicantId}/{$filename}.png.
+     *
+     * The image is validated and re-encoded through GD so the file on disk is a
+     * real PNG regardless of what the browser sent (webcam.js sends JPEG) — every
+     * consumer of these files hard-codes the .png extension.
+     *
+     * @return string|null  error message, or null on success
+     */
+    private function storeDataUriAsPng($dataUri, $folder, $applicantId, $filename)
+    {
+        if (!is_string($dataUri) || !preg_match('#^data:image/[\w.+-]+;base64,(.+)$#s', $dataUri, $m)) {
+            return 'No image captured. Please take a snapshot or upload a photo first.';
+        }
+
+        $bytes = base64_decode($m[1], true);
+        if ($bytes === false || $bytes === '') {
+            return 'Unable to decode the image data.';
+        }
+
+        $directory = public_path('img/'.$folder.'/'.$applicantId);
+        if (!File::isDirectory($directory) && !File::makeDirectory($directory, 0777, true, true)) {
+            return 'Unable to create the image folder on the server.';
+        }
+
+        $path = $directory.DIRECTORY_SEPARATOR.$filename.'.png';
+
+        if (function_exists('imagecreatefromstring')) {
+            $image = @imagecreatefromstring($bytes);
+            if ($image === false) {
+                return 'The file is not a valid image.';
+            }
+            imagesavealpha($image, true);
+            $written = imagepng($image, $path);
+            imagedestroy($image);
+        } else {
+            $written = file_put_contents($path, $bytes) !== false;
+        }
+
+        return $written ? null : 'Failed to write the image file on the server.';
+    }
+
+    /**
+     * Shared handler for the four base64 capture endpoints. Writes the file
+     * first, then records the filename on the applicant, so a failed write never
+     * leaves the record pointing at a missing image.
+     */
+    private function saveCapture(Request $request, $folder, $column, $withExtension = false)
+    {
         $data = $request->all();
 
-        if (!$request->ajax() || empty($data['id']) || empty($data['picture'])) {
+        if (empty($data['id'])) {
             return response()->json(['success' => false, 'message' => 'Invalid request'], 422);
         }
 
-        $update = NewApplication::find($data['id']);
-        if (!$update) {
+        $record = NewApplication::find($data['id']);
+        if (!$record) {
             return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
         }
 
-        $imageParts = explode(';base64,', $data['picture']);
-        if (count($imageParts) !== 2) {
-            return response()->json(['success' => false, 'message' => 'Invalid image data'], 422);
-        }
-
-        $imageBase64 = base64_decode($imageParts[1], true);
-        if ($imageBase64 === false) {
-            return response()->json(['success' => false, 'message' => 'Unable to decode image'], 422);
-        }
-
         $filename = date('YmdHis');
-        session(['active_new_application_id' => $data['id']]);
-        $update->picture = $filename;
-
-        if (!$update->save()) {
-            return response()->json(['success' => false, 'message' => 'Failed to update record'], 500);
+        $error = $this->storeDataUriAsPng($data['picture'] ?? null, $folder, $record->id, $filename);
+        if ($error !== null) {
+            return response()->json(['success' => false, 'message' => $error], 422);
         }
 
-        $relativeDirectory = 'img/application_picture/'.$data['id'];
-        $absoluteDirectory = public_path($relativeDirectory);
-        if (!File::exists($absoluteDirectory)) {
-            File::makeDirectory($absoluteDirectory, 0777, true);
-        }
-
-        $absolutePath = $absoluteDirectory.'/'.$filename.'.png';
-        if (file_put_contents($absolutePath, $imageBase64) === false) {
-            return response()->json(['success' => false, 'message' => 'Failed to write image file'], 500);
+        session(['active_new_application_id' => $record->id]);
+        $record->{$column} = $withExtension ? $filename.'.png' : $filename;
+        if (!$record->save()) {
+            return response()->json(['success' => false, 'message' => 'Failed to update the applicant record'], 500);
         }
 
         return response()->json(['success' => true]);
     }
 
+    public function picture(Request $request) {
+        return $this->saveCapture($request, 'application_picture', 'picture');
+    }
+
     public function captureSignature(Request $request)
     {
-        $data = $request->all();
-        if (!$request->ajax() || empty($data['id']) || empty($data['picture'])) {
-            return response()->json(['success' => false, 'message' => 'Invalid request'], 422);
-        }
-
-        $filename = date("Ymdhmis").'.png';
-        $update = NewApplication::find($data['id']);
-        if (!$update) {
-            return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
-        }
-
-        session(['active_new_application_id' => $data['id']]);
-        $update->signature = $filename;
-        $update->save();
-
-        $destination = 'img/signature/'.$data['id'].'/'.$filename;
-        $destinationTemp = 'img/signature/'.$data['id'].'/';
-        if(!File::exists($destinationTemp)) {
-            File::makeDirectory(public_path().'/'.$destinationTemp, 0777, true);
-        }
-
-        $imageParts = explode(";base64,", $data['picture']);
-        $imageBase64 = isset($imageParts[1]) ? base64_decode($imageParts[1]) : null;
-        if (!$imageBase64) {
-            return response()->json(['success' => false, 'message' => 'Invalid image data'], 422);
-        }
-        file_put_contents($destination, $imageBase64);
-
-        return response()->json(['success' => true]);
+        // signature column stores the full filename (with .png); the others do not
+        return $this->saveCapture($request, 'signature', 'signature', true);
     }
 
     public function fingerprint_right_show(Request $request){
@@ -475,28 +484,7 @@ class NewApplicationController extends Controller
     }
 
     public function fingerprint_right(Request $request){
-        $data = $request->all();
-        $filename= date("Ymdhmis");
-        $record = NewApplication::find($data['id']);
-        if (!$record) {
-            return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
-        }
-        session(['active_new_application_id' => $data['id']]);
-
-        NewApplication::where('id', $data['id'])->update(['finger_print_right'=>  $filename]);
-
-        $destination  = 'img/fingerprint_right/'.$data['id'].'/'.$filename.'.png';
-        $destination_temp  = 'img/fingerprint_right/'.$data['id'].'/';
-
-        if(!File::exists($destination_temp)) {
-            File::makeDirectory(public_path().'/'.'img/fingerprint_right/'.$data['id'].'/',0777,true);
-        } 
-        
-        $image_parts = explode(";base64,", $data['picture']);
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
-        $image_base64 = base64_decode($image_parts[1]);
-        $result = file_put_contents($destination, $image_base64);
+        return $this->saveCapture($request, 'fingerprint_right', 'finger_print_right');
     }
 
     public function fingerprint_left_show(Request $request) {
@@ -505,28 +493,7 @@ class NewApplicationController extends Controller
     }
 
     public function fingerprint_left(Request $request){
-        $data = $request->all();
-        $filename= date("Ymdhmis");
-        $record = NewApplication::find($data['id']);
-        if (!$record) {
-            return response()->json(['success' => false, 'message' => 'Applicant not found'], 404);
-        }
-        session(['active_new_application_id' => $data['id']]);
-
-        NewApplication::where('id', $data['id'])->update(['finger_print_left'=>  $filename]);
-
-        $destination  = 'img/fingerprint_left/'.$data['id'].'/'.$filename.'.png';
-        $destination_temp  = 'img/fingerprint_left/'.$data['id'].'/';
-
-        if(!File::exists($destination_temp)) {
-            File::makeDirectory(public_path().'/'.'img/fingerprint_left/'.$data['id'].'/',0777,true);
-        } 
-        
-        $image_parts = explode(";base64,", $data['picture']);
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
-        $image_base64 = base64_decode($image_parts[1]);
-        $result = file_put_contents($destination, $image_base64);
+        return $this->saveCapture($request, 'fingerprint_left', 'finger_print_left');
     }
 
     public function signature_show(Request $request){
@@ -535,28 +502,30 @@ class NewApplicationController extends Controller
     }
 
     public function signature_update(Request $request, $id){
-        $support = $request->validate([
-            'picture',
+        // Not the `image` rule: on this Laravel 5.8 / Symfony combination
+        // guessExtension() returns "jpg", which `image` does not accept.
+        $request->validate([
+            'picture' => 'required|file|mimes:jpg,jpeg,png,gif,bmp,webp|max:10240',
+        ], [
+            'picture.required' => 'Please choose a signature image to upload.',
+            'picture.mimes'    => 'The signature must be a JPG, PNG, GIF, BMP or WEBP image.',
+            'picture.max'      => 'The signature image must be smaller than 10 MB.',
         ]);
 
-        $file = $request->picture->getClientOriginalName();
-        $filename = pathinfo($file, PATHINFO_FILENAME);
+        $record = NewApplication::findOrFail($id);
 
-        $imageName = $filename.'.'.$request->picture->extension();
+        $filename = date('YmdHis');
+        $dataUri = 'data:image/png;base64,'.base64_encode(file_get_contents($request->file('picture')->getRealPath()));
+        $error = $this->storeDataUriAsPng($dataUri, 'signature', $record->id, $filename);
+        if ($error !== null) {
+            return redirect()->back()->withErrors(['picture' => $error]);
+        }
 
-        $destination  = 'img/signature/'.$id.'/'.$filename.'.png';
-        $destination_temp  = 'img/signature/'.$id.'/';
+        $record->signature = $filename.'.png';
+        $record->save();
+        session(['active_new_application_id' => $record->id]);
 
-        if(!File::exists($destination_temp)) {
-            File::makeDirectory(public_path().'/'.'img/signature/'.$id.'/',0777,true);
-        } 
-        
-        $picture = $request->picture->move(public_path('img/signature/' . $id), $imageName);
-
-        NewApplication::findOrFail($id)->update(['signature' => $imageName]);
-        session(['active_new_application_id' => $id]);
-
-        return redirect(url('new_application?tab=other&id='.$id))->with('success','Signature saved.');
+        return redirect(url('new_application?tab=other&id='.$record->id))->with('success','Signature saved.');
     }
 
 
