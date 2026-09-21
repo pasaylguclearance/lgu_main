@@ -233,8 +233,8 @@
     transition: .3s;
 }
 .dash-card:hover {
-    background: #bdebff !important;
-    transform: scale(1.05);
+    background: var(--pnp-blue-soft) !important;
+    transform: translateY(-2px);
 }
 li.paginate_button.page-item {
     padding: 0px !important;

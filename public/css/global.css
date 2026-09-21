@@ -1,5 +1,5 @@
 div#login {
-    background: linear-gradient(rgb(35 35 125) 35%, rgb(11 132 156) 100%);
+    background: linear-gradient(135deg, #111A5C 0%, #1D2A8C 55%, #C8102E 100%);
     position: absolute;
     height: 100%;
     width: 100%;
@@ -106,7 +106,7 @@ div#login {
   }
   
   .flip-card-back {
-    background-color: #2980b9;
+    background-color: #1D2A8C;
     color: white;
     transform: rotateY(180deg);
   }
@@ -126,22 +126,7 @@ div#login {
     text-align: center !important;
 }
 
-/* nav.navbar.navbar-expand.navbar-theme {
-    background: #00299d !important;
-} */
 
-a.sidebar-brand {
-    background: #fff !important;
-}
 
-.wrapper:before {
-    display: none;
-}
 
-nav.navbar.navbar-expand.navbar-theme {
-    background: #153d77 !important;
-}
 
-h1.header-title {
-    color: black;
-}

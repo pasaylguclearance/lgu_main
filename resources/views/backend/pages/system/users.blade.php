@@ -159,6 +159,14 @@
                 responsive: true
             });
 
+            // "View Profile" (header account menu) lands here with ?edit=<own id>:
+            // open the existing Update User modal for that account.
+            var profileEdit = new URLSearchParams(window.location.search).get('edit');
+            if (profileEdit && /^\d+$/.test(profileEdit)) {
+                edit(profileEdit);
+                $('#defaultModalPrimary').modal('show');
+            }
+
             $('.add').click(function(){
                 $('.modal-title').text('Add User');
                 $('.submit-button').text('Add');

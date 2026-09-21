@@ -15,14 +15,15 @@
                             <h6 class="card-subtitle text-muted">Information for payment of application.</h6>
                         </div>
                         <div class="card-body">
+                            @include('backend.partial.flash-message')
                             <form id="modal-form" action="{{url('payment/save')}}" method="post" enctype="multipart/form-data">
                                 @csrf()
                                 <div class="row">
                                     <div class="form-group col-md-6">
                                         <label for="inputPassword4">Application No</label>
                                         <div class="row col-12">
-                                            <input type="hidden" id="application_id" name="application_id" class="form-control col-10"/>
-                                            <input type="text" class="form-control col-10 application_value" placeholder="Select Application No" disabled/>
+                                            <input type="hidden" id="application_id" name="application_id" value="{{ old('application_id') }}"/>
+                                            <input type="text" class="form-control col-10 application_value @error('application_id') is-invalid @enderror" placeholder="Select Application No" readonly/>
                                             <button type="button" class="btn btn-primary col-2" data-toggle="modal" data-target="#applicationModal"><i class="fas fa-search"></i></button>
                                         </div>
                                     </div>
@@ -110,14 +111,15 @@
                                 <div class="form-group row">
                                     <label class="col-form-label col-sm-4 text-sm-right">Amount:</label>
                                     <div class="col-sm-8">
-                                        <input type="number" class="form-control" placeholder="Total Amount" id="amount" name="amount">
+                                        <input type="number" class="form-control @error('amount') is-invalid @enderror" placeholder="Total Amount" id="amount" name="amount" value="{{ old('amount') }}" step="0.01" min="0" required>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-md-6" style="text-align: right;">
                                         <a href="" data-toggle="modal" data-target="#defaultModalPrimary"><button class="btn btn-primary">View Receipt</button></a>
                                     </div>
-                                        <button type="submit" class="btn btn-primary" id="addBtn">Add Payment</button>
+                                        <button type="submit" class="btn btn-primary" id="addBtn" disabled title="Select an Application No first">Add Payment</button>
+                                    <small class="form-text text-muted w-100 text-right" id="addHint">Select an Application No (search button above) to enable payment.</small>
                                 </div>
                             </form>
                         </div>
@@ -126,17 +128,17 @@
             </div>
         </div>
         {{-- APPLICATION MODAL --}}
-            <div class="modal fade" id="applicationModal" style="background: rgba(0,0,0,0.5);" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal fade" id="applicationModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5>Application No</h5>
+                            <h5 class="modal-title">Select Application No</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body m-3">
-                            <table id="application_table" class="table table-striped" style="width:100%">
+                        <div class="modal-body">
+                            <table id="application_table" class="table table-striped pnp-picker" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -178,7 +180,7 @@
 
         {{-- MODAL --}}
         <div class="modal fade" id="defaultModalPrimary" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-centered modal-receipt" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Payment Receipt</h5>
@@ -258,6 +260,7 @@
             $('.total_amount').text(total)
             $('#date_of_expiration').val(date);
             $('#ucid').val(ucid);
+            syncAddButton();
         }
 
         function edit(id){
@@ -284,10 +287,17 @@
 
         }
 
+        function syncAddButton() {
+            var hasApp = $('#application_id').val() !== '';
+            $('#addBtn').prop('disabled', !hasApp);
+            $('#addHint').toggle(!hasApp);
+        }
+
         $(function() {
+            syncAddButton();
             $('#datatables, #application_table').DataTable({
                 responsive: true,
-                "pageLength": 100
+                "pageLength": 10
             });
 
             $( "table" ).on( "click", ".edit", function() {

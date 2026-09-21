@@ -17,10 +17,10 @@
 
 
     #mainDiv {
-        background: #88ccfc;
+        background: var(--pnp-blue-soft);
         padding: 10px;
         border: 5px solid;
-        border-color: #42adf4;
+        border-color: var(--pnp-blue);
         border-radius: 20px;
 
         position: absolute;
@@ -45,17 +45,17 @@
     .button {
         width: 120px;
         border: 3px solid;
-        border-color: #42adf4;
+        border-color: var(--pnp-blue);
         border-radius: 20px;
-        background: #a1d6fc;
-        color: #204a87;
+        background: #fff;
+        color: var(--pnp-blue);
         cursor: pointer;
     }
 
     .fingerprint-div {
         width: 160px;
         height: 240px;
-        border: 5px solid #42adf4;
+        border: 5px solid var(--pnp-blue);
     }
 
     .fingerprint-div > img {
@@ -65,7 +65,7 @@
 
     .disclaimer {
         font-size: 10px;
-        color: #204a87;
+        color: var(--pnp-blue);
     }
 
     .title {

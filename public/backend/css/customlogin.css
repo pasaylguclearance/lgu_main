@@ -37,7 +37,7 @@ p.section-title span {
 }
 .col-md-4.form-0 {
     padding: 0px !important;
-    background: #091e3e;
+    background: linear-gradient(160deg, #111A5C 0%, #1D2A8C 60%, #A31226 100%);
     padding-top: 4em !important;
     padding-bottom: 4em !important;
 }
@@ -58,7 +58,7 @@ p.form-label {
 }
 .col-md-8.slider-0 {
     padding: 0px !important;
-    background: #dddddd;
+    background: #E3E6EE;
 }
 p.form-label.forgot-password {
     text-align: right;
@@ -69,8 +69,10 @@ p.form-btn {
 }
 p.form-btn button.btn.btn-primary {
     width: 120px;
-    background-color:#c6262f !important;
-    border-color: #c6262f !important;
+    background-color: #C8102E !important;
+    border-color: #C8102E !important;
+    border-radius: 8px;
+    font-weight: 700;
 }
 .form-1.submit-btn {
     margin-top: 4em;
@@ -83,4 +85,22 @@ p.form-btn button.btn.btn-primary {
 }
 .form-carousel {
     margin: 4em;
+}p.form-btn button.btn.btn-primary:hover,
+p.form-btn button.btn.btn-primary:focus {
+    background-color: #A31226 !important;
+    border-color: #A31226 !important;
+    box-shadow: 0 0 0 .2rem rgba(255, 212, 0, .35) !important;
+}
+input#password, input#email {
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, .35);
+}
+input#password:focus, input#email:focus {
+    border-color: #FFD400;
+    box-shadow: 0 0 0 .2rem rgba(255, 212, 0, .25);
+}
+p.form-label {
+    font-weight: 700;
+    letter-spacing: .08em;
+    font-size: 12px;
 }

@@ -9,16 +9,15 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<link rel="icon" href="{{ asset('/img/logo.png') }}" type="image/x-icon">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="description" content="Responsive Bootstrap 4 Admin &amp; Dashboard Template">
-	<meta name="author" content="Bootlab">
+	<meta name="description" content="Pasay City Police Clearance System">
 	<title>PNP Clearance</title>
 	<link rel="stylesheet" href="{{asset('css/jquery.dataTables.min.css')}}">
 	<script src="{{ asset('js/jquery.min.js') }}"></script>
 	{{-- <script src="{{ asset('backend/js/settings.js') }}"></script> --}}
 	<link href="{{ asset('docs/css/modern.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/global.css') }}" rel="stylesheet">
-	<link href="{{ asset('css/new_design.css') }}" rel="stylesheet">
 	<link rel="stylesheet" href="{{asset('css/buttons.dataTables.min.css')}}">
+	<link href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}" rel="stylesheet">
 	<script type="text/javascript">var ac_max_results = 0;</script>
 	@yield('links')
 	@yield('style')
@@ -30,8 +29,7 @@
 	</div>
 
 	<div class="wrapper">
-		<!-- sidebar -->
-        @include('backend.partial.sidebar')
+
 		<div class="main">
 			<!-- header -->
             @include('backend.partial.header')
@@ -64,9 +62,26 @@
 	<script src="{{ asset('/js/responsive.bootstrap.min.js') }}"></script>
 	<script src="{{ asset('docs/js/app.js') }}"></script>
 	<script src="{{ asset('backend/js/app.js') }}"></script>
+	<script src="{{ asset('/js/pnp-table.js') }}?v={{ filemtime(public_path('js/pnp-table.js')) }}"></script>
 	<script src="{{ asset('js/moment.js') }}"></script>
 	<script src="{{ asset('/ui/jquery-ui.js') }}"></script>
 	<script src="{{ asset('/ui/jquery-ui.min.js') }}"></script>
+	<script src="{{ asset('/js/pnp-datepicker.js') }}?v={{ filemtime(public_path('js/pnp-datepicker.js')) }}"></script>
+	<script src="{{ asset('/js/pnp-select.js') }}?v={{ filemtime(public_path('js/pnp-select.js')) }}"></script>
+	<script>
+		// Re-measure DataTables columns once fonts/layout are final (they are
+		// initialised before the web font loads and keep stale widths otherwise).
+		(function () {
+			function adjustTables() {
+				if (window.jQuery && jQuery.fn.dataTable && jQuery.fn.dataTable.tables) {
+					try { jQuery.fn.dataTable.tables({ visible: true, api: true }).columns.adjust(); } catch (e) {}
+				}
+			}
+			window.addEventListener('load', adjustTables);
+			if (document.fonts && document.fonts.ready) { document.fonts.ready.then(adjustTables); }
+			window.addEventListener('resize', function () { clearTimeout(window.__pnpDtT); window.__pnpDtT = setTimeout(adjustTables, 150); });
+		})();
+	</script>
 	<script>
 		window.pnplogo = function()
 		{

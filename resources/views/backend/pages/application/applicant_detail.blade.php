@@ -107,17 +107,17 @@
         </div>
 
            {{-- APPLICATION MODAL --}}
-           <div class="modal fade" id="applicationModal" style="background: rgba(0,0,0,0.5);" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+           <div class="modal fade" id="applicationModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5>Application No</h5>
+                        <h5 class="modal-title">Select Application No</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body m-3">
-                        <table id="application_table" class="table table-striped" style="width:100%">
+                        <table id="application_table" class="table table-striped pnp-picker" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -169,7 +169,7 @@
             $('#datatables').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 pageLength:10,
                 ordering: false,
                 ajax: {
@@ -221,7 +221,7 @@
             $('#application_table').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 pageLength:10,
                 ajax: {
                 url: "/application/list_applicant",
@@ -283,7 +283,7 @@
             $('#datatables').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 pageLength:10,
                 ordering: false,
                 ajax: {
@@ -350,15 +350,9 @@
             white-space: nowrap
         }
         
+        /* Search panel sits above the table (in flow, not fixed) — styled in theme.css */
         div#search_box {
-            position: fixed;
-            bottom: 0;
-            z-index: 9;
-            background: black;
-            width: 100%;
-            left: 0;
-            padding: 12px;
-            color: #fff;
+            position: static;
         }
     </style>
 @endsection

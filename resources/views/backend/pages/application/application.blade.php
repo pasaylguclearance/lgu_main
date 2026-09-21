@@ -156,17 +156,17 @@
     </div>
 
     {{-- APPLICATION MODAL --}}
-    <div class="modal fade" id="applicationModal" style="background: rgba(0,0,0,0.5);" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal fade" id="applicationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5>Application No</h5>
+                    <h5 class="modal-title">Select Application No</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body m-3">
-                    <table id="application_table" class="table table-striped" style="width:100%">
+                    <table id="application_table" class="table table-striped pnp-picker" style="width:100%">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -223,14 +223,12 @@
         $(function() {
             var listTable = $('#datatables').DataTable({
                 responsive: true,
-                scrollX: true,
                 pageLength: 25,
                 order: [[0, 'desc']]
             });
 
             $('#application_table').DataTable({
                 responsive: true,
-                scrollX: true,
                 pageLength: 25
             });
 

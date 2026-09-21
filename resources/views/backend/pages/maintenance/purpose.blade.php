@@ -114,7 +114,7 @@
         $(function() {
             $('#datatables').DataTable({
                 responsive: true,
-                "pageLength": 100
+                "pageLength": 10
             });
 
             $( "table" ).on( "click", ".edit", function() {

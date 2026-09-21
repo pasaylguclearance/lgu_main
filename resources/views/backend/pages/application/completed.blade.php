@@ -814,7 +814,7 @@
             $('#datatables').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 ordering: false,
                 pageLength:10,
                 ajax: {
@@ -970,7 +970,7 @@
             $('#datatables').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 ordering: false,
                 pageLength:10,
                 ajax: {
@@ -1089,20 +1089,15 @@
             font-family: 'barcode';
             src: url("/font/barcode.ttf");
         }
+        /* Search panel sits above the table (in flow, not fixed) — styled in theme.css */
         div#search_box {
-            position: fixed;
-            bottom: 0;
-            z-index: 9;
-            background: black;
-            width: 100%;
-            left: 0;
-            padding: 12px;
-            color: #fff;
+            position: static;
         }
         .renewal-info {
             display: flex;
             padding: 10px;
-            background: #eee;
+            background: var(--pnp-blue-soft);
+            border-radius: 12px;
             margin-bottom: 20px;
         }
         .r-details {

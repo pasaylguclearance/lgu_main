@@ -8,7 +8,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>PNP Clearance System</title>
+    <title>Pasay Police Clearance</title>
+    <link rel="icon" href="{{ asset('/img/logo.png') }}" type="image/x-icon">
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -19,7 +20,6 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('backend/css/customlogin.css') }}" rel="stylesheet">
 
     @yield('styles')
 
@@ -33,5 +33,6 @@
             @yield('content')
         </main>
     </div>
+    @yield('scripts')
 </body>
 </html>
